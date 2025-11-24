@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso a Dominios</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .login-section h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
+
+        .login-section p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        #login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        input[type="text"] {
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        .redirect-section {
+            margin: 20px 0;
+        }
+
+        .redirect-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .redirect-link {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .redirect-link:hover {
+            background: #218838;
+        }
+
+        .back-btn {
+            background: #6c757d;
+            margin-top: 20px;
+        }
+
+        .back-btn:hover {
+            background: #5a6268;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Formulario de login -->
+        <div id="login-section" class="login-section">
+            <h1>Bienvenido</h1>
+            <p>Ingresa tu nombre de usuario para acceder a tu Horario</p>
+            <form id="login-form">
+                <input type="text" id="username" placeholder="Nombre de usuario" required>
+                <button type="submit">Acceder</button>
+            </form>
+        </div>
+
+        <!-- Sección de redirección -->
+        <div id="redirect-section" class="redirect-section hidden">
+            <h2 id="welcome-message">Bienvenido, <span id="user-display"></span></h2>
+            <div class="redirect-info">
+                <p id="domain-info">Serás redirigido automáticamente en 3 segundos...</p>
+                <a id="redirect-link" class="redirect-link" href="#" target="_blank">
+                    Ir al dominio ahora
+                </a>
+            </div>
+            <button id="back-button" class="back-btn">Volver</button>
+        </div>
+    </div>
+
+    <script>
+        // Mapeo de usuarios a dominios - CORREGIDO
+        const userDomains = {
+            'NOELIA44899014R': 'https://docs.google.com/spreadsheets/d/1fw9osnTvH9zHWuKwoXBUjUqt2FLv9FJCyElh8Lh5VU0/edit?gid=653285813#gid=653285813',
+            'ANNA53752438N': 'https://docs.google.com/spreadsheets/d/1XqpiV9alo69f9QpSXdDgxpz4pA_Ja-cMI-vox039UH0/edit?gid=134124195#gid=134124195',
+            'ALEJANDRO44513404D': 'https://docs.google.com/spreadsheets/d/1YqToT7fAg3LKKN0A6buDyNgB1D7QU9WBSltgMHYxldg/edit?gid=388562283#gid=388562283',
+            'PEDRO47078191C': 'https://docs.google.com/spreadsheets/d/1cln2o5nlyUdxmeOZegNXfbfsasrjWskf9uBD6YYtIFM/edit?gid=1156938889#gid=1156938889',
+            'MOLINA44892028F': 'https://docs.google.com/spreadsheets/d/1mAEHyhpf_qgr5wElzOAdONThfxY1_0Yjr3B5SKmAnl0/edit?gid=1617156749#gid=1617156749',
+            'GABRIEL54951308F': 'https://docs.google.com/spreadsheets/d/1NlFWsBSu91ldCgiVA1Huy2alcNoEyi-47ajbb_fKm0U/edit?gid=1290393095#gid=1290393095',
+            'BORJA29204900Y': 'https://docs.google.com/spreadsheets/d/1mOzpvFo7DgJH6it8VTexNmF1zz8PwVr0etlPQijuZ2E/edit?gid=1722781405#gid=1722781405',
+            'JUANJOSE53880751P': 'https://docs.google.com/spreadsheets/d/1NlFWsBSu91ldCgiVA1Huy2alcNoEyi-47ajbb_fKm0U/edit?gid=1290393095#gid=1290393095',
+            'RAUL': 'https://docs.google.com/spreadsheets/d/1HFk_1aNwm-Futjrr5dHVEOVktvvKgrblL-yO56L1j58/edit?gid=0#gid=0'
+        };
+
+        // Elementos del DOM
+        const loginSection = document.getElementById('login-section');
+        const redirectSection = document.getElementById('redirect-section');
+        const loginForm = document.getElementById('login-form');
+        const usernameInput = document.getElementById('username');
+        const userDisplay = document.getElementById('user-display');
+        const domainInfo = document.getElementById('domain-info');
+        const redirectLink = document.getElementById('redirect-link');
+        const welcomeMessage = document.getElementById('welcome-message');
+        const backButton = document.getElementById('back-button');
+
+        // Manejar el envío del formulario
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = usernameInput.value.trim();
+            
+            if (username) {
+                redirectUser(username);
+            }
+        });
+
+        // Función para redirigir al usuario
+        function redirectUser(username) {
+            // Convertir a mayúsculas para que coincida con las claves
+            const usernameUpper = username.toUpperCase();
+            
+            // Dominio por defecto si el usuario no está en la lista
+            const domain = userDomains[usernameUpper] || 'https://www.google.com';
+            
+            // Actualizar la interfaz
+            userDisplay.textContent = usernameUpper;
+            domainInfo.textContent = `Serás redirigido automáticamente en 3 segundos...`;
+            redirectLink.href = domain;
+            redirectLink.textContent = `Ir a la hoja de cálculo`;
+            
+            // Cambiar mensaje de bienvenida según el usuario
+            if (userDomains[usernameUpper]) {
+                welcomeMessage.innerHTML = 'Bienvenido, <span id="user-display">' + usernameUpper + '</span>';
+            } else {
+                welcomeMessage.innerHTML = 'Usuario no encontrado, <span id="user-display">' + usernameUpper + '</span>';
+            }
+            
+            // Mostrar sección de redirección con animación
+            loginSection.classList.add('hidden');
+            redirectSection.classList.remove('hidden');
+            redirectSection.classList.add('fade-in');
+            
+            // INICIAR REDIRECCIÓN AUTOMÁTICA
+            startAutoRedirect(domain);
+            
+            // Limpiar el input
+            usernameInput.value = '';
+        }
+
+        // Función de redirección automática
+        function startAutoRedirect(domain) {
+            let seconds = 3;
+            const countdown = setInterval(() => {
+                domainInfo.textContent = `Serás redirigido automáticamente en ${seconds} segundos...`;
+                seconds--;
+                
+                if (seconds < 0) {
+                    clearInterval(countdown);
+                    window.open(domain, '_blank');
+                }
+            }, 1000);
+        }
+
+        // Botón para volver
+        backButton.addEventListener('click', function() {
+            redirectSection.classList.add('hidden');
+            loginSection.classList.remove('hidden');
+            loginSection.classList.add('fade-in');
+        });
+
+        // Enter para enviar el formulario
+        usernameInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                loginForm.dispatchEvent(new Event('submit'));
+            }
+        });
+    </script>
+</body>
+</html>
